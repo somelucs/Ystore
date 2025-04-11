@@ -27,11 +27,9 @@ async function signMessage() {
         return;
     }
 
-    // Conectar carteira
     const resp = await provider.connect();
     const pubkey = resp.publicKey.toString();
 
-    // Obter challenge do backend
     const challengeResponse = await fetch("/get_challenge", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -40,11 +38,9 @@ async function signMessage() {
     const challengeData = await challengeResponse.json();
     const challenge = challengeData.challenge;
 
-    // Assinar mensagem com a wallet
     const signedMessage = await provider.signMessage(new TextEncoder().encode(challenge), "utf8");
     const signatureBase64 = btoa(String.fromCharCode(...new Uint8Array(signedMessage.signature)));
 
-    // Enviar assinatura para o backend validar
     const verifyResponse = await fetch("/verify_signature", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
