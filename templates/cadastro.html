@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem vindo à Ystore!</title>
+   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div style="text-align: center;">
+    <p style="font-size: 30px;" id="txt1">Registre-se!</p>
+        <button class="offset" id="btn">Registrar com exchange!</button>
+
+</div>
+ <script>
+function setCookie(cname, cvalue, exdays) {
+  const d = new Date();
+  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  let expires = "expires="+ d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+async function signMessage() {
+    const provider = window.solana; // Phantom Wallet
+    if (!provider) {
+        alert("Phantom Wallet não encontrada!");
+        return;
+    }
+
+    // Conectar carteira
+    const resp = await provider.connect();
+    const pubkey = resp.publicKey.toString();
+
+    // Obter challenge do backend
+    const challengeResponse = await fetch("/get_challenge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pubkey })
+    });
+    const challengeData = await challengeResponse.json();
+    const challenge = challengeData.challenge;
+
+    // Assinar mensagem com a wallet
+    const signedMessage = await provider.signMessage(new TextEncoder().encode(challenge), "utf8");
+    const signatureBase64 = btoa(String.fromCharCode(...new Uint8Array(signedMessage.signature)));
+
+    // Enviar assinatura para o backend validar
+    const verifyResponse = await fetch("/verify_signature", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            pubkey,
+            signature: signatureBase64
+        })
+    }); 
+    const verifyData = await verifyResponse.json();
+    if (verifyData.status === "success") {
+        setCookie('user',pubkey,2)
+        window.location.href = verifyData.url1; // Redirecionar para a página
+    }
+    //window.location.href='/reg'
+    return verifyData
+}
+
+document.getElementById('btn').onclick=function(){
+
+
+signMessage()
+
+
+}
+
+ </script>
+
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem vindo à Ystore!</title>
+   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div style="text-align: center;">
+    <p style="font-size: 30px;" id="txt1">Bem vindo à Ystore!</p>
+    <a href="/cad"><button class="offset">Cadastro</button></a>
+    <button class="fill">Login</button>
+
+</div>
+
+    <script>
+var txt1=document.getElementById('txt1')
+var time=0
+function loop(){
+time+=1
+
+if (time==30){
+
+//txt1.innerHTML=txt1.innerHTML.substring(0,txt1.innerHTML.length-1)
+time=0
+}
+
+
+requestAnimationFrame(loop)
+}
+requestAnimationFrame(loop)
+
+    </script>
+
+</body>
+</html>

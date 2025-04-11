@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área de pagamentos</title>
+   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div style="text-align: center;">
+    <p style="font-size: 30px;" id="txt1">Realizar pagamento</p>
+</div><br>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<button class="close">{{valor}} SOL</button><br>
+<p style="font-size: 20px;">Escaneie para fazer a transação:</p><br>
+<div id="qrcode"></div>
+<a href="/trns?val={{valor}}&nm={{name}}"><button class="offset" onclick="sig()">Depois de realiza-lá, clique aqui</button><br></a>
+<script type="module">  
+    var qr = new QRCode(document.getElementById("qrcode"), {
+            text: "{{link}}"+"&reference="+String(document.cookie).replace('user=',''), // Link ou texto que o QR Code conterá
+            width: 200,
+            height: 200
+        });
+
+function sig(){
+}
+  </script>
+
+</body>
+</html>

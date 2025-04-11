@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área de produtos</title>
+   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+
+
+<p style="font-size: 30px;text-align:center;" >Produtos à venda:</p>
+
+<fieldset style="background-color: rgb(40,30,40);border-color: gray;">
+<div style="display: flex; text-align: center;">
+    
+    <a><button class="close">Categorias:</button></a>
+<a href="/src?q=livroElivrosEliteraturaEobras"><button class="raise">Livros/literatura</button></a>
+<a href="/src?q=dispositivoEtecnologiaEcelularEsoftwareEeletrônicoEcomputadorEprocessador"><button class="raise">Tecnologia</button></a>
+<a href="/src?q=itemEdomesticoEcasaEcozinhaEroupaElavarEmáquinaEquarto"><button class="raise">Itens domésticos</button></a>
+<a href="/reg"><button class="raise">Todos</button></a>
+<a href="/src?q=algumEalgumaEcoisaEcoisasEalgo"><button class="raise">Outros</button></a>
+
+<form action="/psq?psq=1" method="post" style="display: flex;">
+    <h2>
+<input type="text" name="psq">
+<input type="submit" value="Pesquisar">
+    </h2>
+</form>
+
+
+</div></fieldset><br>
+<div style="display: flex;">
+
+    <div style="text-align: left;">
+        <fieldset style="text-align: left; width: 400px;background-color: rgb(10, 10, 30);border-color: gray;border-color: blue;border-radius:8px;" hidden id="fld">
+            <button class="raise" id="bt1" hidden></button><br>
+            <button class="raise" id="bt2" hidden></button><br>
+            <button class="slide" id="i1" hidden>Continuar</button>
+        </fieldset>
+        <div style="display: flex;">
+            <img alt="QR Code de Pagamento" id="wl">
+            <button class="offset">Sua wallet</button>
+            </div>
+
+    <fieldset style="text-align: left; width: 400px;background-color: rgb(10,10,30);border-color: blue;border-radius:8px;">
+    <button class="slide" style="font-size: 20px;">Colocar um produto à venda:</button>
+   
+    <form method="post" action="/create" enctype="multipart/form-data">
+        <p style="font-size: 20px;" >Descrição do produto:</p><br>
+        <input type="text" name="prod"><br>
+        <p style="font-size: 20px;" >Coloque a imagem do produto:</p><br>
+        <input type="file" name="img" style="color: white;" accept="image/*"><br>
+        <p style="font-size: 20px;" >Valor em SOL:</p>
+        <input type="number" name="val"><br>
+        <input type="submit" value="Vender!">
+
+    </form>
+    </fieldset>
+    </div>
+    
+    <div >
+        
+            
+        <div style="border-radius: 10px;height: 100px;border-color: white;" >         
+            
+            
+        {% for m1 in regs %}
+        <div style="display: flex;">
+        {% for img in imgs[loop.index-1:loop.index]  %}
+            <img src="{{ url_for('static', filename=img) }}" alt="Imagem" style="max-width: 300px; max-height: 300px;">   {% endfor %}
+            
+            {% for m2 in m1 %}
+            
+                    <button class="slide" style="height: 80px;">
+                        <p id="m2_{{ loop.index }}">{{ m2 }}</p>
+                    </button>
+            {% endfor %}
+            
+            <button class="offset" id="comprar_{{ loop.index }}" data-index="{{ loop.index }}" style="height: 80px;" >Comprar</button>
+
+            <script type="application/json" id="meu-json">
+                {{ regs | tojson | safe }}
+            </script>         
+        </div><br>
+         {% endfor %}  </div>     
+
+
+        
+        <div id="galeria"></div>
+        
+        <script>
+
+function setCookie(cname, cvalue, exdays) {
+  const d = new Date();
+  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  let expires = "expires="+ d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+            document.getElementById('wl').src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data="+String(document.cookie)
+
+            document.querySelectorAll(".offset").forEach(button => {
+                button.onclick = function() {
+                    var jsonData = JSON.parse(document.getElementById("meu-json").textContent);
+                    var nm = this.dataset.index;
+                    var nom2 = Object.values(jsonData);
+        
+                    document.getElementById('fld').hidden = false;
+                    document.getElementById('bt1').hidden = false;
+                    document.getElementById('bt2').hidden = false;
+                    document.getElementById('i1').hidden = false;
+                    document.getElementById('bt1').innerText = nom2[nm - 1][0];
+                    document.getElementById('bt2').innerText = nom2[nm - 1][1];
+                    document.getElementById('i1').onclick=function(){
+
+                        async function signMessage() {
+    const provider = window.solana; // Phantom Wallet
+    if (!provider) {
+        alert("Phantom Wallet não encontrada!");
+        return;
+    }
+
+    // Conectar carteira
+    const resp = await provider.connect();
+    const pubkey = resp.publicKey.toString();
+
+    // Obter challenge do backend
+    const challengeResponse = await fetch("/get_challenge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pubkey })
+    });
+    const challengeData = await challengeResponse.json();
+    const challenge = challengeData.challenge;
+
+    // Assinar mensagem com a wallet
+    const signedMessage = await provider.signMessage(new TextEncoder().encode(challenge), "utf8");
+    const signatureBase64 = btoa(String.fromCharCode(...new Uint8Array(signedMessage.signature)));
+
+    // Enviar assinatura para o backend validar
+    const verifyResponse = await fetch("/verify_signature", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            pubkey,
+            signature: signatureBase64
+        })
+    });
+sessionStorage.setItem('usr',[signatureBase64,pubkey])
+    const verifyData = await verifyResponse.json();
+    var solanaPayLink='solana:89BBgM9DZSgMUSkc3zptNzXw7Zt7tjgJyUVx4RrkXBzW?amount='+String(nom2[nm - 1][1])+'&spl-token=SOL&network=devnet'
+    if (verifyData.status === "success") {
+        //window.location.href =solanaPayLink
+
+        setCookie('user',pubkey,2)
+        window.location.href = verifyData.url2+'?q='+nom2[nm - 1][0]+'&v='+nom2[nm - 1][1]; // Redirecionar para a página
+    }
+    //window.location.href='/reg'
+    return verifyData
+}
+
+signMessage()
+
+
+
+                    }
+        
+                    var img = document.getElementById(String(nm-1));
+                    img.src = "{{ url_for('static', filename='"+ img+"') }}";
+                };
+            });
+
+
+        </script>
+        
+
+</body>
+</html>
