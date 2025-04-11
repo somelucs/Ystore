@@ -21,7 +21,7 @@ function setCookie(cname, cvalue, exdays) {
 }
 
 async function signMessage() {
-    const provider = window.solana; // Phantom Wallet
+    const provider = window.solana; 
     if (!provider) {
         alert("Phantom Wallet não encontrada!");
         return;
@@ -56,9 +56,8 @@ async function signMessage() {
     const verifyData = await verifyResponse.json();
     if (verifyData.status === "success") {
         setCookie('user',pubkey,2)
-        window.location.href = verifyData.url1; // Redirecionar para a página
+        window.location.href = verifyData.url1;
     }
-    //window.location.href='/reg'
     return verifyData
 }
 
