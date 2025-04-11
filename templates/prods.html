@@ -116,17 +116,15 @@ function setCookie(cname, cvalue, exdays) {
                     document.getElementById('i1').onclick=function(){
 
                         async function signMessage() {
-    const provider = window.solana; // Phantom Wallet
+    const provider = window.solana; 
     if (!provider) {
         alert("Phantom Wallet não encontrada!");
         return;
     }
 
-    // Conectar carteira
     const resp = await provider.connect();
     const pubkey = resp.publicKey.toString();
 
-    // Obter challenge do backend
     const challengeResponse = await fetch("/get_challenge", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -135,11 +133,9 @@ function setCookie(cname, cvalue, exdays) {
     const challengeData = await challengeResponse.json();
     const challenge = challengeData.challenge;
 
-    // Assinar mensagem com a wallet
     const signedMessage = await provider.signMessage(new TextEncoder().encode(challenge), "utf8");
     const signatureBase64 = btoa(String.fromCharCode(...new Uint8Array(signedMessage.signature)));
 
-    // Enviar assinatura para o backend validar
     const verifyResponse = await fetch("/verify_signature", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -152,12 +148,10 @@ sessionStorage.setItem('usr',[signatureBase64,pubkey])
     const verifyData = await verifyResponse.json();
     var solanaPayLink='solana:89BBgM9DZSgMUSkc3zptNzXw7Zt7tjgJyUVx4RrkXBzW?amount='+String(nom2[nm - 1][1])+'&spl-token=SOL&network=devnet'
     if (verifyData.status === "success") {
-        //window.location.href =solanaPayLink
 
         setCookie('user',pubkey,2)
         window.location.href = verifyData.url2+'?q='+nom2[nm - 1][0]+'&v='+nom2[nm - 1][1]; // Redirecionar para a página
     }
-    //window.location.href='/reg'
     return verifyData
 }
 
