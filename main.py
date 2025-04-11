@@ -131,13 +131,13 @@ try:
     def registro():
         def rgs():
             mtx=[]
-            with open("C:/Users/lucas/Downloads/Projetos/testes/imgs.json", "r") as arquivo2:
+            with open("imgs.json", "r") as arquivo2:
                 dadosI = json.load(arquivo2)
             mtxI=[]
             for i in range(len(dadosI)):
                 mtxI.append(dadosI[str(i+1)])
 
-            with open("C:/Users/lucas/Downloads/Projetos/testes/regs.json", "r") as arquivo:
+            with open("regs.json", "r") as arquivo:
                 dados = json.load(arquivo)
                 if dados!={}:
                     prods = list(dados.keys())
@@ -162,7 +162,7 @@ try:
         mtxn=[]
         mQry=qry.split('E')
         for z in range(len(mQry)):
-            with open("C:/Users/lucas/Downloads/Projetos/testes/regs.json", "r") as arquivo:
+            with open("regs.json", "r") as arquivo:
                 sQry=mQry[z]
                 dados = json.load(arquivo)
                 prods = list(dados.keys())
@@ -174,12 +174,12 @@ try:
                             mtxn.append(i)
             def rgs():
                 mtx=[]
-                with open("C:/Users/lucas/Downloads/Projetos/testes/imgs.json", "r") as arquivo2:
+                with open("imgs.json", "r") as arquivo2:
                     dadosI = json.load(arquivo2)
                 mtxI=[]
                 
 
-                with open("C:/Users/lucas/Downloads/Projetos/testes/regs.json", "r") as arquivo:
+                with open("regs.json", "r") as arquivo:
                     dados = json.load(arquivo)
                     if dados!={}:
                         prods = list(dados.keys())
@@ -198,14 +198,14 @@ try:
         if request.referrer!='/reg':
             prod=request.form['prod']
             val=request.form['val']
-            with open("C:/Users/lucas/Downloads/Projetos/testes/regs.json", "r") as arquivo:
+            with open("regs.json", "r") as arquivo:
                 dados = json.load(arquivo)
-            with open("C:/Users/lucas/Downloads/Projetos/testes/imgs.json", "r") as arquivo2:
+            with open("imgs.json", "r") as arquivo2:
                 dadosI = json.load(arquivo2)
             dados[prod]=str(val)
             file = request.files["img"]
             if file.filename!="":
-                file.save("C:/Users/lucas/Downloads/Projetos/testes/static/"+file.filename)
+                file.save("static/"+file.filename)
                 dadosI[str(len(dadosI)+1)]=file.filename
             else:
                 dadosI[str(len(dadosI)+1)]="N"
@@ -214,14 +214,14 @@ try:
                 mtxI.append(dadosI[str(len(dadosI))])
 
         
-            with open("C:/Users/lucas/Downloads/Projetos/testes/regs.json", "w", encoding="utf-8") as arquivo:
+            with open("regs.json", "w", encoding="utf-8") as arquivo:
                 json.dump(dados, arquivo, indent=4, ensure_ascii=False)
-            with open("C:/Users/lucas/Downloads/Projetos/MyBC&T/imgs.json", "w", encoding="utf-8") as arquivo2:
+            with open("imgs.json", "w", encoding="utf-8") as arquivo2:
                 json.dump(dadosI, arquivo2, indent=4, ensure_ascii=False)
             def rgs():
                 mtx=[]
 
-                with open("C:/Users/lucas/Downloads/Projetos/testes/regs.json", "r") as arquivo:
+                with open("regs.json", "r") as arquivo:
                     dados2 = json.load(arquivo)
                     if dados2!={}:
                         prods = list(dados2.keys())
